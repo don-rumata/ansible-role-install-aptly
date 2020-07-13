@@ -1,0 +1,31 @@
+---
+- name: Install NFS Kernel server
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt:
+    name:
+      - nfs-kernel-server
+    state: present
+    install_recommends: yes
+
+- name: Config /etc/exports
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  lineinfile:
+    path: /etc/exports
+    line: '{{ aptly_path_to_local_repo }}/public          *(ro,sync,no_subtree_check)'
+    state: present
+
+- name: Enable and start NFS service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  service:
+    name: nfs-kernel-server
+    state: started
+    enabled: yes

@@ -1,0 +1,16 @@
+     # https://www.gnupg.org/documentation//manuals/gnupg/Unattended-GPG-key-generation.html
+     %echo OpenPGP key 4 Aptly
+     Key-Type: {{ aptly_gpg_key_type }}
+     Key-Length: {{ aptly_gpg_key_length }}
+     Subkey-Type: RSA
+     Subkey-Length: 4096
+     Name-Real: {{ aptly_gpg_key_maintainer }}
+     Name-Comment: ({{ aptly_gpg_key_comment }})
+     Name-Email: {{ aptly_gpg_key_email }}
+     Expire-Date: {{ aptly_gpg_key_expire_date }}
+     # Passphrase: {{ aptly_gpg_key_pass }}
+     # https://superuser.com/a/1360557/505198
+     %no-protection
+     # Do a commit here, so that we can later print "done" :-)
+     %commit
+     %echo done

@@ -1,0 +1,163 @@
+---
+# Over cli
+
+# http://vladimir-stupin.blogspot.com/2019/08/debian-aptly.html
+
+# aptly repo create test-repo-01
+
+# rsync -avrhuP pxe::soft/rocketchat/client/rocketchat_latest_x86_64.deb /var/aptly/upload/rocketchat/
+
+# aptly repo add test-repo-01 /var/aptly/upload/rocketchat/rocketchat_latest_x86_64.deb
+
+# aptly repo show test-repo-01
+# # Name: test-repo-01
+# # Comment: 
+# # Default Distribution: 
+# # Default Component: main
+# # Number of packages: 1
+
+# aptly repo edit -distribution="rolling" test-repo-01
+# # Local repo [test-repo-01] successfully updated.
+
+# aptly repo show test-repo-01
+# # Name: test-repo-01
+# # Comment: 
+# # Default Distribution: rolling
+# # Default Component: main
+# # Number of packages: 1
+
+# aptly publish repo -skip-signing=true test-repo-01
+# # Loading packages...
+# # Generating metadata files and linking package files...
+# # Finalizing metadata files...
+
+# # Local repo test-repo-01 has been successfully published.
+# # Please setup your webserver to serve directory '/var/aptly/public' with autoindexing.
+# # Now you can add following line to apt sources:
+# #   deb http://your-server/ rolling main
+# # Don't forget to add your GPG key to apt with apt-key.
+
+# # You can also use `aptly serve` to publish your repositories over HTTP quickly.
+
+# aptly publish list
+# # Published repositories:
+# #   * ./bionic (origin: Oracle Corporation) [amd64, i386] publishes {main: [repo-vbox-test-01-snap-01]: Snapshot from mirror [repo-vbox-test-01]: http://download.virtualbox.org/virtualbox/debian/ bionic}
+# #   * ./rolling [amd64] publishes {main: [test-repo-01]}
+
+# aptly publish list -raw
+# # . bionic
+# # . rolling
+
+# curl http://localhost:8080/api/repos | jq .
+# [
+#   {
+#     "Name": "test-repo-01",
+#     "Comment": "",
+#     "DefaultDistribution": "rolling",
+#     "DefaultComponent": "main"
+#   },
+# ]
+
+# ls -l /var/aptly/public/dists/
+# drwxr-xr-x 3 aptly aptly 4096 ???  4 16:18 rolling
+
+#######################################################
+
+---
+# aptly_my_first_repo_name: testing
+
+# http://vladimir-stupin.blogspot.com/2019/08/debian-aptly.html
+
+# # https://www.aptly.info/doc/api/repos/
+
+# curl -X POST -H 'Content-Type: application/json' --data '{"Name":"testing","Comment":"","DefaultDistribution":"","DefaultComponent":""}' http://localhost:8080/api/repos
+- name: Create my first repo
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/repos
+    method: POST
+    body_format: json
+    body:
+      # {"Name":"testing","Comment":"","DefaultDistribution":"","DefaultComponent":""}
+      Name: "{{ aptly_my_first_repo_name }}"
+      Comment: My first repo comment
+      DefaultDistribution: "default-distribution-value"
+      DefaultComponent: "default-component-value"
+    status_code:
+      - 201
+      - 400
+
+# # curl -X DELETE -H 'Content-Type: application/json' http://localhost:8080/api/repos/testing
+# - name: Delete my first repo
+#   uri:
+#     url: http://localhost:{{ aptly_api_port }}/api/repos/{{ aptly_my_first_repo_name }}
+#     method: DELETE
+#     status_code:
+#       - 404
+
+# # curl http://localhost:8080/api/repos/testing
+# - name: Show my first repo
+#   uri:
+#     url: http://localhost:{{ aptly_api_port }}/api/repos/{{ aptly_my_first_repo_name }}
+#     method: GET
+#     status_code:
+#       - 200
+#       - 404
+
+- name: Create dir in upload dir
+  uri:
+    url:  http://localhost:8080/api/files/rocketchat
+    method: POST
+    status_code:
+      - 200
+      - 201
+      - 400
+
+- name: Add file to "upload" dir
+  become: yes
+  get_url:
+    url: http://pxe/soft/rocketchat/client/rocketchat_latest_x86_64.deb
+    dest: '{{ aptly_path_to_local_repo }}/upload/rocketchat/rocketchat_latest_x86_64.deb'
+
+# https://www.aptly.info/doc/api/repos/
+- name: ADD PACKAGES FROM UPLOADED FILE/DIRECTORY
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/repos/{{ aptly_my_first_repo_name }}/file/rocketchat/rocketchat_latest_x86_64.deb
+    method: POST
+    status_code:
+      - 200
+      - 201
+      - 400
+
+# - name: stop
+#   become: yes
+#   block:
+#     - shell: systemctl stop aptly-api.service
+
+# - name: RUN aptly aptly publish repo {{ aptly_my_first_repo_name }}
+#   become: yes
+#   become_user: '{{ aptly_user }}'
+#   command: "{{ item }}"
+#   with_items:
+#     - aptly repo create -comment="Wheezy prehistoric" -distribution="wheezy-prehistoric" -architectures="i386,amd64,all" -component="non-free" wheezy-prehistoric
+#     # - aptly show wheezy-prehistoric
+#     - rsync -a pxe::soft/teamviewer/teamviewer_x86_64.deb /tmp/
+#     - aptly repo add wheezy-prehistoric /tmp/teamviewer_x86_64.deb
+#     - aptly publish repo wheezy-prehistoric
+
+###################################################
+
+# - name: Dirty create aptly repo over cli
+#   when:
+#     - ansible_os_family == 'Debian'
+#     - ansible_pkg_mgr == 'apt'
+#   become: yes
+#   become_user: '{{ aptly_user }}'
+#   block:
+#     - command: aptly repo create {{ test_repo_name }}
+#     - command: rsync -avrhuP pxe::soft/rocketchat/client/rocketchat_latest_x86_64.deb /var/aptly/upload/rocketchat/
+#     - command: aptly repo add {{ test_repo_name }} /var/aptly/upload/rocketchat/rocketchat_latest_x86_64.deb
+#     - command: aptly repo show {{ test_repo_name }}
+#     - command: aptly repo edit -distribution="{{ test_repo_distribution }}" {{ test_repo_name }}
+#     - command: aptly publish repo {{ test_repo_name }}
+#     - command: aptly publish list
+#     # - shell: echo 'deb http://localhost/deb {{ test_repo_distribution }} main' > /etc/apt/sources.list.d/1.list

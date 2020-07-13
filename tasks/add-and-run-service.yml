@@ -1,0 +1,32 @@
+---
+- name: Create Aptly service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  template:
+    src: aptly-api.service.j2
+    dest: /lib/systemd/system/{{ aptly_api_service_name }}.service
+    backup: yes
+  notify:
+    - reload-daemon
+    - restart-aptly-api
+
+- name: Create Aptly service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  service:
+    name: "{{ aptly_api_service_name }}.service"
+    state: started
+    enabled: yes
+
+- name: Wait for Aptly service start
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  wait_for:
+    port: '{{ aptly_api_port }}'
+    # host: localhost
+    state: started

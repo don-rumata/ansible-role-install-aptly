@@ -1,0 +1,64 @@
+---
+- name: Create directory structure 4 aptly
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  file:
+    path: "{{ item }}"
+    owner: "{{ aptly_user }}"
+    group: "{{ aptly_group }}"
+    state: directory
+  with_items:
+    - '{{ aptly_path_to_local_repo }}'
+    - '{{ aptly_path_to_local_repo }}/public'
+    - '{{ aptly_path_to_local_repo }}/upload'
+    - '{{ aptly_path_to_local_repo }}/db'
+
+- name: Create directory structure 4 gpg keys 4 aptly
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_gpg_key_generate == true
+  become: yes
+  file:
+    path: '{{ aptly_gpg_key_path }}'
+    owner: "{{ aptly_user }}"
+    group: "{{ aptly_group }}"
+    state: directory
+
+- name: Create directory structure 4 rsync access
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_rsync_access == true
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/rsyncd.conf.d
+    - /var/log/rsyncd
+
+- name: Create directory structure 4 www access
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_access == true
+  become: yes
+  file:
+    path: '{{ aptly_www_local_path }}'
+    state: directory
+
+- name: Create directory structure 4 ftp access
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_ftp_access == true
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - '{{ aptly_ftp_anon_root_dir }}'
+    - '{{ aptly_ftp_local_path }}'

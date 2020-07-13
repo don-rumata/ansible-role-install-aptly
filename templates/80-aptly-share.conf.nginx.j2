@@ -1,0 +1,20 @@
+# https://nginx.org/ru/docs/beginners_guide.html
+server {
+    listen 80;
+    listen [::]:80;
+#   root /var/www;
+
+    # https://habr.com/ru/post/353478/
+    # https://qna.habr.com/q/78932
+    location /{{ aptly_www_module_name }} {
+        alias {{ aptly_www_local_path }};
+        autoindex on;
+        sendfile on;
+        sendfile_max_chunk 1m;
+#       autoindex_format json;
+#       autoindex_localtime on;
+#       autoindex_exact_size off;
+        try_files $uri $uri/ =404;
+    }
+}
+

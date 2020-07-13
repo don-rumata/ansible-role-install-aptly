@@ -1,0 +1,87 @@
+---
+- name: Install Apache
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt:
+    name:
+      - apache2
+    state: present
+    install_recommends: yes
+
+- name: Disable 000-default.conf
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  command: a2dissite 000-default.conf
+  args:
+    removes: /etc/apache2/sites-enabled/000-default.conf
+
+- name: Allow access deb repo over http
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_webdav_access == false
+  become: yes
+  template:
+    src: 80-aptly-share.conf.apache.j2
+    dest: /etc/apache2/sites-available/080-aptly-share.conf
+    mode: '644'
+    backup: yes
+
+- name: Allow access deb repo over wedav
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_webdav_access == true
+  become: yes
+  template:
+    src: 80-aptly-share-webdav.conf.apache.j2
+    dest: /etc/apache2/sites-available/080-aptly-share.conf
+    mode: '644'
+    backup: yes
+
+# http://ashep.org/2011/nastrojka-webdav-pod-apache2/
+- name: Enable apache modules 4 webdav
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_webdav_access == true
+  become: yes
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - dav_fs
+    - dav
+
+- name: Enable share aptly
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  command: a2ensite 080-aptly-share.conf
+  args:
+    creates: /etc/apache2/sites-enabled/080-aptly-share.conf
+  # notify: restart-apache
+
+- name: Validate Apache configuration
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  command: apache2ctl configtest
+  register: apache_configtest
+  changed_when: apache_configtest.rc != 0
+
+- name: Enable and start Apache service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  service:
+    name: apache2
+    state: started
+    enabled: yes

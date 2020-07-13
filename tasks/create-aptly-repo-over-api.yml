@@ -1,0 +1,82 @@
+---
+# http://vladimir-stupin.blogspot.com/2019/08/debian-aptly.html
+
+# https://www.aptly.info/doc/api/repos/
+
+# curl -X POST -H 'Content-Type: application/json' --data '{"Name":"my-first-repo","Comment":"Repo generated with https://github.com/don-rumata/ansible-role-install-aptly","DefaultDistribution":"rolling","DefaultComponent":"main"}' http://localhost:8080/api/repos
+- name: Create my first repo
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/repos
+    method: POST
+    body_format: json
+    body:
+      Name: "{{ aptly_my_first_repo_name }}"
+      DefaultDistribution: "{{ aptly_my_first_repo_distribution }}"
+    status_code:
+      - 201
+      - 400
+  tags:
+    - api
+    - repo
+    - create
+
+- name: Edit my first repo
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/repos/{{ aptly_my_first_repo_name }}
+    method: PUT
+    body_format: json
+    body:
+      Name: "{{ aptly_my_first_repo_name }}"
+      Comment: "{{ aptly_my_first_repo_comment }}"
+      DefaultDistribution: "{{ aptly_my_first_repo_distribution }}"
+      DefaultComponent: "{{ aptly_my_first_repo_component }}"
+    status_code:
+      - 200
+      - 201
+      - 400
+  tags:
+    - api
+    - repo
+    - edit
+    - update
+
+# curl -X POST -H 'Content-Type: application/json' --data '{"SourceKind": "local", "Sources": [{"Name": "my-first-repo"}], "Architectures": ["i386", "amd64"], "Distribution": "rolling"}' http://localhost:8080/api/publish
+- name: Publish my first repo
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/publish/.
+    method: POST
+    body_format: json
+    body:
+      SourceKind: "local"
+      # Sources: [{"Name": "{{ aptly_my_first_repo_name }}"}]
+      Sources:
+        - Name: "{{ aptly_my_first_repo_name }}"
+          Component: "{{ aptly_my_first_repo_component }}"
+      Architectures:
+        - i386
+        - amd64
+      Distribution: "{{ aptly_my_first_repo_distribution }}"
+    status_code:
+      - 200
+      - 201
+      - 400
+  tags:
+    - api
+    - repo
+    - publish
+
+#--- draft ---#
+# "body": {
+#     "Architectures": [
+#         "i386", 
+#         "amd64"
+#     ], 
+#     "Distribution": "rolling", 
+#     "SourceKind": "local", 
+#     "Sources": [
+#         {
+#             "Name": "my-first-repo"
+#         }
+#     ]
+# }, 
+# "body_format": "json", 

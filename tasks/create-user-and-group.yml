@@ -1,0 +1,14 @@
+---
+- name: Create user and group 4 aptly
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  user:
+    name: '{{ aptly_user }}'
+    create_home: yes
+    password_lock: yes
+    comment: Aptly Service User
+    system: true
+    home: '{{ aptly_path_to_local_repo }}'
+    shell: /bin/false

@@ -1,0 +1,71 @@
+---
+- name: Show gpg keys
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: gpg --list-keys
+  register: gpg_list_keys
+  changed_when: gpg_list_keys.rc != 0
+
+- name: Create answers 4 generate gpg key
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  template:
+    src: gpg-gen-key-answers.j2
+    dest: '{{ aptly_gpg_key_path }}/gpg-gen-key-answers'
+    owner: '{{ aptly_user }}'
+    group: '{{ aptly_group }}'
+    mode: '600'
+    backup: yes
+
+- name: Generate GPG key for repo
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - not (aptly_gpg_key_email in gpg_list_keys.stdout)
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: 'gpg --batch --gen-key {{ aptly_gpg_key_path }}/gpg-gen-key-answers'
+
+# https://mirrors.tripadvisor.com/centos-vault/4.5/docs/html/rhel-sbs-en-4/s1-gnupg-export.html
+# http://fx-files.ru/archives/1462
+- name: Export GPG key to var
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: 'gpg --export --armor {{ aptly_gpg_key_email }}'
+  register: aptly_gpg_key_export
+  changed_when: aptly_gpg_key_export.rc != 0
+
+- name: Export GPG key to file in ASCII
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  copy:
+    content: '{{ aptly_gpg_key_export.stdout }}'
+    dest: '{{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}'
+    owner: '{{ aptly_user }}'
+    group: '{{ aptly_group }}'
+
+- name: Add GPG key to trusted db in localhost
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt_key:
+    file: '{{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}'
+    state: present
+
+- name: Sign GPG repo key
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: 'gpg --sign --default-key {{ aptly_gpg_key_email }} {{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}'
+  args:
+    creates: '{{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}.gpg'

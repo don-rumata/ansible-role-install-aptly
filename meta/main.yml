@@ -1,0 +1,31 @@
+galaxy_info:
+  author: don Rumata
+  description: Install Aptly on Debian or Ubuntu.
+
+  company: localhost
+
+  license: Apache License, Version 2.0
+
+  min_ansible_version: 2.8
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+        - focal
+    - name: Debian
+      version:
+        - oldstable
+        - stable
+        - testing
+
+  galaxy_tags:
+    - linux
+    - ubuntu
+    - debian
+    - deb
+    - repository
+    - repo
+
+  dependencies: []

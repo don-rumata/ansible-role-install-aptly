@@ -1,0 +1,12 @@
+alias.url += ("/{{ aptly_www_module_name }}" => "{{ aptly_www_local_path }}")
+
+$HTTP["url"] =~ "^/{{ aptly_www_module_name }}" {
+  server.follow-symlink = "enable"
+}
+
+$HTTP["url"] =~ "/(\.|_)ht" {
+  url.access-deny = ( "" )
+}
+$HTTP["url"] =~ "^/{{ aptly_www_module_name }}/(bin|data|inc|conf)" {
+  url.access-deny = ( "" )
+}

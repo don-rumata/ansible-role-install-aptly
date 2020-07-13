@@ -1,0 +1,53 @@
+---
+- import_tasks: get-aptly-api-service-status-and-stop.yml
+
+- name: Get info about created repos
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: aptly repo list -raw
+  register: aptly_created_repos
+  changed_when: aptly_created_repos.rc != 0
+  tags:
+    - cli
+    - repo
+
+- name: Create Aptly repo with cli
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - not (aptly_my_first_repo_name in aptly_created_repos.stdout)
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: aptly repo create -distribution="{{ aptly_my_first_repo_distribution }}" -comment="{{ aptly_my_first_repo_comment }}" -component="{{ aptly_my_first_repo_component }}" {{ aptly_my_first_repo_name }}
+  tags:
+    - cli
+    - repo
+
+- name: Get info about published repos
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: aptly publish list -raw
+  register: aptly_published_repos
+  changed_when: aptly_published_repos.rc != 0
+  tags:
+    - cli
+    - repo
+
+# https://github.com/aptly-dev/aptly/issues/20
+- name: Publish Aptly repo with cli
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - not (aptly_my_first_repo_distribution in aptly_published_repos.stdout)
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: aptly -architectures=i386,amd64 publish repo {{ aptly_my_first_repo_name }}
+  tags:
+    - cli
+    - repo

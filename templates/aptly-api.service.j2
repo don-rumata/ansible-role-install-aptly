@@ -1,0 +1,26 @@
+[Unit]
+Description=The Aptly api server
+After=network.target remote-fs.target nss-lookup.target
+
+# https://ma.ttias.be/auto-restart-crashed-service-systemd/
+StartLimitIntervalSec=500
+StartLimitBurst=10
+
+[Service]
+ExecStart=/usr/bin/aptly api serve -listen=:{{ aptly_api_port }}
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=aptly
+
+User={{ aptly_user }}
+Group={{ aptly_group }}
+
+# WorkingDirectory={{ aptly_path_to_local_repo }}
+
+# https://ma.ttias.be/auto-restart-crashed-service-systemd/
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

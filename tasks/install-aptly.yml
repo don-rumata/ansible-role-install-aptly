@@ -1,0 +1,37 @@
+---
+# # DRAFT
+# - name: Get aptly versions
+#   when:
+#     - ansible_os_family == 'Debian'
+#     - ansible_pkg_mgr == 'apt'
+#   become: yes
+#   package_facts:
+  # register: qazwsxedc
+
+# - debug:
+#     # msg: eeeeeee "{{ qazwsxedc.packages.accountsservice }}"
+#     var: ansible_facts.packages.htop
+
+# - name: Get aptly latest version
+#   set_fact:
+#     # НЕ РАБОТАЕТ!!!
+#     aptly_latest_version: "{{ ansible_facts.packages['aptly'][0].version }}"
+#     # aptly_latest_version: "{{ ansible_facts.packages['aptly'] }}"
+#     # РАБОТАЕТ!!!
+#     # aptly_latest_version: "{{ ansible_facts.packages['htop'][0].version }}"
+#     # aptly_latest_version: "{{ ansible_facts.packages['accountsservice'][0].version }}"
+
+- name: Install Aptly 4 Debian\Ubuntu
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt:
+    name:
+      # - aptly={{ aptly_latest_version }}
+      - aptly
+      - graphviz
+      # - aptly-publisher
+    # state: present
+    state: latest
+    install_recommends: yes

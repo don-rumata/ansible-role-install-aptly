@@ -1,0 +1,82 @@
+---
+- import_tasks: get-aptly-api-service-status-and-stop.yml
+  when:
+    - aptly_add_first_software_in_created_repo_over == 'cli'
+
+#--- Download ---#
+
+- name: Download Viber
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  get_url:
+    dest: '{{ aptly_path_to_local_repo }}/upload/viber.deb'
+    url: https://download.cdn.viber.com/cdn/desktop/Linux/viber.deb
+    owner: "{{ aptly_user }}"
+    group: "{{ aptly_group }}"
+
+#--- Add ---#
+
+- name: Add Viber to repo over cli
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_add_first_software_in_created_repo_over == 'cli'
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: 'aptly repo add {{ aptly_my_first_repo_name }} {{ aptly_path_to_local_repo }}/upload/viber.deb'
+  register: add_pachage_to_repo
+  changed_when: add_pachage_to_repo.rc != 0
+
+- name: Add Viber to repo over api
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_add_first_software_in_created_repo_over == 'api'
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/repos/{{ aptly_my_first_repo_name }}/file/viber.deb
+    method: POST
+    status_code:
+      - 200
+      - 201
+      - 400
+
+#--- Publish ---#
+
+- name: Update publish repo
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_add_first_software_in_created_repo_over == 'cli'
+  become: yes
+  become_user: '{{ aptly_user }}'
+  command: 'aptly publish update {{ aptly_my_first_repo_distribution }}'
+
+# curl -X PUT -H 'Content-Type: application/json' --data '{"SourceKind": "local", "Sources": [{"Component":"main","Name":"my-first-repo"}], "Architectures": ["i386", "amd64"], "Distribution": "rolling"}' http://localhost:8080/api/publish/./rolling
+- name: Update published repo over api
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_add_first_software_in_created_repo_over == 'api'
+  uri:
+    url: http://localhost:{{ aptly_api_port }}/api/publish/:./{{ aptly_my_first_repo_distribution }}
+    method: PUT
+    body_format: json
+    body:
+      SourceKind: "local"
+      # Sources: [{"Name": "{{ aptly_my_first_repo_name }}"}]
+      Sources:
+        - Name: "{{ aptly_my_first_repo_name }}"
+          Component: "{{ aptly_my_first_repo_component }}"
+      Architectures:
+        - i386
+        - amd64
+      Distribution: "{{ aptly_my_first_repo_distribution }}"
+    status_code:
+      - 200
+      - 201
+      - 400
+
+# Update
+# curl -v -X PUT -H 'Content-Type: application/json' --data '{}' http://localhost:8080/api/publish/<repository_name>/trusty

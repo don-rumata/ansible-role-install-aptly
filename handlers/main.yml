@@ -1,0 +1,41 @@
+---
+- name: update-apt-repo-cache
+  become: yes
+  apt:
+    update_cache: yes
+    force: yes
+
+- name: reload-daemon
+  become: yes
+  command: systemctl daemon-reload
+
+- name: restart-aptly-api
+  become: yes
+  service:
+    name: "{{ aptly_api_service_name }}"
+    state: restarted
+
+- name: update-mount-points
+  become: yes
+  command: mount -a
+  # https://www.ansiblejunky.com/blog/ansible-101-disable-warning-messages/
+  args:
+    warn: false
+
+- name: restart-apache
+  become: yes
+  service:
+    name: apache2
+    state: restarted
+
+- name: restart-lighttpd
+  become: yes
+  service:
+    name: lighttpd
+    state: restarted
+
+- name: restart-nginx
+  become: yes
+  service:
+    name: nginx
+    state: restarted

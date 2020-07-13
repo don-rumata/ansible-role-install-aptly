@@ -1,0 +1,40 @@
+---
+- name: Create Aptly config
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  template:
+    src: aptly.conf.j2
+    dest: /etc/aptly.conf
+    backup: yes
+
+- name: Edit fstab 4 Aptly www access
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_access == true
+  become: yes
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ item }}"
+    backup: yes
+  with_items:
+    - '# Added for Aptly repo share from web'
+    - '{{ aptly_path_to_local_repo }}/public    {{ aptly_www_local_path }}    none    bind,nobootwait    0    0'
+  notify: update-mount-points
+
+- name: Edit fstab 4 Aptly ftp access
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_ftp_access == true
+  become: yes
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ item }}"
+    backup: yes
+  with_items:
+    - '# Added for Aptly repo share from ftp'
+    - '{{ aptly_path_to_local_repo }}/public    /srv/ftp/{{ aptly_ftp_module_name }}    none    bind,nobootwait    0    0'
+  notify: update-mount-points

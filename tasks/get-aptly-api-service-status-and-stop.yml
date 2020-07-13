@@ -1,0 +1,38 @@
+---
+- name: Check if {{ aptly_api_service_name }} unit file exists
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  stat:
+    path: /lib/systemd/system/{{ aptly_api_service_name }}.service
+  register: aptly_api_service_state
+  tags:
+    - cli
+    - repo
+
+- name: Get service facts
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_api_service_state.stat.exists == true
+  service_facts:
+  tags:
+    - cli
+    - repo
+
+# - debug:
+#     msg: "{{ ansible_facts.services['{{ aptly_api_service_name }}.service'] }}"
+#     msg: "{{ ansible_facts.services['aptly-api.service'].state }}"
+
+- name: Stop {{ aptly_api_service_name }} service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_api_service_state.stat.exists == true
+  become: yes
+  service:
+      name: '{{ aptly_api_service_name }}'
+      state: stopped
+  tags:
+    - cli
+    - repo

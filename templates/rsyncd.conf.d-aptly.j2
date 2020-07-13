@@ -1,0 +1,11 @@
+[{{ aptly_rsync_module_name }}]
+        comment = | Deb repo
+        path = {{ aptly_rsync_local_path }}
+        use chroot = true
+        log file = /var/log/rsyncd/aptly.log
+        read only = true
+        list = yes
+        timeout = 600
+        dont compress = *
+        uid = {{ aptly_user }}                                                                                                             
+        gid = {{ aptly_group }}

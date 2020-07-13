@@ -1,0 +1,8 @@
+---
+- name: Update cache 4 Debian\Ubuntu
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt:
+    update_cache: yes

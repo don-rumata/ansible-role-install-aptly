@@ -1,0 +1,12 @@
+---
+- name: Aptly repo version set fact
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  block:
+    - set_fact:
+        aptly_repo_version_fact: squeeze
+      when: aptly_repo_version == 'stable'
+    - set_fact:
+        aptly_repo_version_fact: nightly
+      when: aptly_repo_version == 'unstable'

@@ -1,0 +1,48 @@
+---
+- import_tasks: update-cache.yml
+  when: ansible_virtualization_type == 'docker'
+
+- import_tasks: get-aptly-version-and-set-facts.yml
+
+- import_tasks: add-repo.yml
+
+- import_tasks: install-aptly.yml
+
+- import_tasks: create-user-and-group.yml
+
+- import_tasks: create-directory-structure.yml
+
+- import_tasks: add-config.yml
+
+- import_tasks: add-and-run-service.yml
+  when:
+    - aptly_run_api_service == true
+
+- import_tasks: gpg-gen-key.yml
+  when:
+    - aptly_gpg_key_generate == true
+
+- import_tasks: create-aptly-repo-over-{{ aptly_my_first_repo_create_over }}.yml
+  when:
+    - aptly_my_first_repo_create == true
+
+- import_tasks: add-my-first-software-in-repo.yml
+  when:
+    - aptly_add_first_software_in_created_repo == true
+
+# Backends for the Backend God!!!
+- import_tasks: install-ftp-backend.yml
+  when:
+    - aptly_ftp_access == true
+
+- import_tasks: install-nfs-backend.yml
+  when:
+    - aptly_nfs_access == true
+
+- import_tasks: install-rsyncd-backend.yml
+  when:
+    - aptly_rsync_access == true
+
+- import_tasks: install-www-{{ aptly_www_backend }}-backend.yml
+  when:
+    - aptly_www_access == true

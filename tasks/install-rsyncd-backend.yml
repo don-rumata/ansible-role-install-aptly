@@ -1,0 +1,43 @@
+---
+- name: Install Rsyncd
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt:
+    name:
+      - rsync
+    state: present
+    install_recommends: yes
+
+- name: Config /etc/rsyncd.conf
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  lineinfile:
+    path: /etc/rsyncd.conf
+    line: '&include /etc/rsyncd.conf.d'
+    create: yes
+    state: present
+
+- name: Allow access deb repo over rsync
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  template:
+    src: rsyncd.conf.d-aptly.j2
+    dest: /etc/rsyncd.conf.d/aptly.conf
+    mode: '644'
+    backup: yes
+
+- name: Enable and start lighttpd service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  service:
+    name: rsync
+    state: started
+    enabled: yes

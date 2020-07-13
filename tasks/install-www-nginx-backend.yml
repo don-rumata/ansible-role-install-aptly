@@ -1,0 +1,70 @@
+---
+# https://ahelpme.com/software/aptly/install-aptly-under-ubuntu-18-lts-with-nginx-serving-the-packages-and-the-first-steps/
+- name: Install Nginx
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  apt:
+    name:
+      - nginx
+      - nginx-extras
+    state: present
+    install_recommends: yes
+
+- name: Delete default config from "sites-enabled"
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Allow access deb repo over http
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_webdav_access == false
+  become: yes
+  template:
+    src: 80-aptly-share.conf.nginx.j2
+    dest: /etc/nginx/sites-available/80-aptly-share.conf
+    mode: '644'
+    backup: yes
+    validate: bash -c 'nginx -t -c /dev/stdin <<< "events {worker_connections 1;} http { include %s; }"'
+
+# https://serverfault.com/a/811520/315697
+- name: Allow access deb repo over wedav
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+    - aptly_www_webdav_access == true
+  become: yes
+  template:
+    src: 80-aptly-share-webdav.conf.nginx.j2
+    dest: /etc/nginx/sites-available/80-aptly-share.conf
+    mode: '644'
+    backup: yes
+    # validate: bash -c 'nginx -t -c /dev/stdin <<< "events {worker_connections 1;} http { include %s; }"'
+
+- name: Enable share aptly
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  file:
+    src: /etc/nginx/sites-available/80-aptly-share.conf
+    dest: /etc/nginx/sites-enabled/80-aptly-share.conf
+    state: link
+  notify: restart-nginx
+
+- name: Enable and start nginx service
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  service:
+    name: nginx
+    state: started
+    enabled: yes

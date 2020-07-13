@@ -1,0 +1,117 @@
+---
+#--- Main section ---#
+# squeeze or nightly: https://www.aptly.info/download/
+aptly_repo_version: stable
+# aptly_repo_version: unstable
+
+aptly_path_to_local_repo: /var/aptly
+
+aptly_user: aptly
+
+aptly_group: aptly
+
+#--- API section ---#
+aptly_run_api_service: true
+# aptly_run_api_service: false
+
+# https://www.aptly.info/doc/api/
+aptly_api_port: 8080
+
+# /lib/systemd/system/aptly-api.service
+aptly_api_service_name: aptly-api
+
+#--- First repo serction ---#
+aptly_my_first_repo_create: true
+# aptly_create_my_first_repo: false
+
+# https://www.aptly.info/doc/api/repos/ or https://www.aptly.info/doc/aptly/repo/create/
+aptly_my_first_repo_create_over: api
+# aptly_my_first_repo_create_over: cli
+
+# aptly repo create <name>
+aptly_my_first_repo_name: my-first-repo
+
+# -distribution="" from https://www.aptly.info/doc/aptly/repo/create/
+aptly_my_first_repo_distribution: rolling
+
+aptly_my_first_repo_comment: Repo generated with https://github.com/don-rumata/ansible-role-install-aptly
+
+# https://wiki.debian.org/ru/SourcesList
+aptly_my_first_repo_component: main
+# aptly_my_first_repo_component: contrib
+# aptly_my_first_repo_component: non-free
+
+#--- Software in created repo section ---#
+
+# Viber. Why? Because permanent direct download link.
+# aptly_add_first_software_in_created_repo: true
+aptly_add_first_software_in_created_repo: false
+
+aptly_add_first_software_in_created_repo_over: api
+# aptly_add_first_software_in_created_repo_over: cli
+
+#--- GPG section ---#
+aptly_gpg_key_generate: true
+# aptly_gpg_key_generate: false
+
+aptly_gpg_key_path: '{{ aptly_path_to_local_repo }}/gpg'
+
+aptly_gpg_publickey_filename: repo.key
+
+aptly_gpg_key_maintainer: Jon Doe
+
+aptly_gpg_key_email: aptly@example.com
+
+aptly_gpg_key_expire_date: 365
+
+# TODO. aptly_create_gpg_pass: true\false
+aptly_gpg_key_pass: qazwsxedc
+
+aptly_gpg_key_comment: with stupid passphrase
+
+aptly_gpg_key_type: RSA
+
+aptly_gpg_key_length: 4096
+
+#!!! ALL accesses in READ ONLY 4 all !!!#
+
+#--- www section ---#
+aptly_www_access: true
+# aptly_www_access: false
+
+aptly_www_webdav_access: true
+# aptly_www_webdav_access: false
+
+# http://localhost/deb <---
+aptly_www_module_name: deb
+
+aptly_www_backend: nginx
+# aptly_www_backend: lighttpd
+# aptly_www_backend: apache
+
+aptly_www_local_path: /var/www/{{ aptly_www_module_name }}
+
+#--- rsync section ---#
+aptly_rsync_access: true
+# aptly_rsync_access: false
+
+# rsync://localhost/deb <---
+aptly_rsync_module_name: deb
+
+aptly_rsync_local_path: '{{ aptly_path_to_local_repo }}/public'
+
+#--- ftp section ---#
+aptly_ftp_access: true
+# aptly_ftp_access: false
+
+# ftp://localhost/deb <---
+aptly_ftp_module_name: deb
+
+# "anon_root" in vsftpd.conf
+aptly_ftp_anon_root_dir: /srv/ftp
+
+aptly_ftp_local_path: '{{ aptly_ftp_anon_root_dir }}/{{ aptly_ftp_module_name }}'
+
+#--- nfs section ---#
+aptly_nfs_access: true
+# aptly_nfs_access: false

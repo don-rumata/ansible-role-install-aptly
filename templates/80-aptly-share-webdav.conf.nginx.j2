@@ -1,0 +1,31 @@
+# https://nginx.org/ru/docs/beginners_guide.html
+server {
+    listen 80;
+    listen [::]:80;
+#   root /var/www;
+
+    # https://habr.com/ru/post/353478/
+    # https://qna.habr.com/q/78932
+    location /{{ aptly_www_module_name }} {
+        alias {{ aptly_www_local_path }};
+        autoindex on;
+        sendfile on;
+        sendfile_max_chunk 1m;
+#       autoindex_format json;
+#       autoindex_localtime on;
+#       autoindex_exact_size off;
+        try_files $uri $uri/ =404;
+    
+    # https://oxozle.com/2018/01/21/nastrojka-web-dav-v-nginx/
+    # https://stackoverflow.com/a/59134640
+        charset utf-8;
+        dav_access user:r group:r all:r;
+        dav_methods PUT DELETE MKCOL COPY MOVE;
+        dav_ext_methods PROPFIND OPTIONS;
+        create_full_put_path on;
+        client_max_body_size 100M;
+        fancyindex on;
+        fancyindex_exact_size off;
+    }
+}
+
