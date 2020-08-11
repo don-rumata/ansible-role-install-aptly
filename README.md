@@ -1,6 +1,6 @@
 # Ansible Role: Install Aptly
 
-[![License][license-image]][license-url] [![Ansible Galaxy][ansible-galaxy-image]][ansible-galaxy-url]
+[![License][license-image]][license-url] [![Ansible Galaxy][ansible-galaxy-image]][ansible-galaxy-url] [![Ansible Galaxy Quality][ansible-galaxy-quality-image]][ansible-galaxy-url]
 
 Install [Aptly](https://www.aptly.info/) on Debian or Ubuntu.
 
@@ -303,3 +303,5 @@ Apache License, Version 2.0
 
 [ansible-galaxy-image]: https://img.shields.io/badge/ansible_galaxy-don__rumata.ansible__role__install__aptly-blue.svg
 [ansible-galaxy-url]: https://galaxy.ansible.com/don_rumata/ansible_role_install_aptly
+
+[ansible-galaxy-quality-image]: https://img.shields.io/ansible/quality/49710
