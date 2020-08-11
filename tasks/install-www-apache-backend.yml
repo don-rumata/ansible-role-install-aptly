@@ -67,6 +67,32 @@
     creates: /etc/apache2/sites-enabled/080-aptly-share.conf
   # notify: restart-apache
 
+- name: Config port
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  lineinfile:
+    dest: /etc/apache2/ports.conf
+    line: 'Listen {{ aptly_www_port }}'
+    insertafter: '^# /etc/apache2/sites-enabled/000-default.conf'
+    backup: yes
+  tags:
+    - www-port
+
+- name: Comment default port
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  replace:
+    path: /etc/apache2/ports.conf
+    regexp: "^Listen 80"
+    replace: '# Listen 80'
+    backup: yes
+  tags:
+    - www-port
+
 - name: Validate Apache configuration
   when:
     - ansible_os_family == 'Debian'

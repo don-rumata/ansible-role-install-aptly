@@ -110,6 +110,8 @@ aptly_www_webdav_access: true
 # http://localhost/deb <---
 aptly_www_module_name: deb
 
+aptly_www_port: 80
+
 aptly_www_backend: nginx
 # aptly_www_backend: lighttpd
 # aptly_www_backend: apache
@@ -198,7 +200,7 @@ Install **un**stable version `aptly` without all features:
   tasks:
 ```
 
-Install stable version `aptly`, with create repo over cli and share **empty** repo over apache:
+Install stable version `aptly`, with create repo over cli and share **empty** repo over apache on port 83:
 
 ```yaml
 - name: Install Aptly
@@ -217,6 +219,7 @@ Install stable version `aptly`, with create repo over cli and share **empty** re
     aptly_www_access: true
     aptly_www_backend: apache
     aptly_www_webdav_access: false
+    aptly_www_port: 83
     aptly_rsync_access: false
     aptly_ftp_access: false
     aptly_nfs_access: false

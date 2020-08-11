@@ -9,6 +9,8 @@
     name:
       - nginx
       - nginx-extras
+      # # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=851784#10
+      # - nginx-full
     state: present
     install_recommends: yes
 

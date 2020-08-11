@@ -85,6 +85,8 @@ aptly_www_webdav_access: true
 # http://localhost/deb <---
 aptly_www_module_name: deb
 
+aptly_www_port: 80
+
 aptly_www_backend: nginx
 # aptly_www_backend: lighttpd
 # aptly_www_backend: apache

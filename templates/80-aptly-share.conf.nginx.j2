@@ -1,7 +1,7 @@
 # https://nginx.org/ru/docs/beginners_guide.html
 server {
-    listen 80;
-    listen [::]:80;
+    listen {{ aptly_www_port }};
+    listen [::]:{{ aptly_www_port }};
 #   root /var/www;
 
     # https://habr.com/ru/post/353478/

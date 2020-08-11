@@ -82,6 +82,19 @@
     chdir: /etc/lighttpd/conf-enabled
     creates: 80-aptly-share-webdav.conf
 
+- name: Config port
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_pkg_mgr == 'apt'
+  become: yes
+  replace:
+    path: /etc/lighttpd/lighttpd.conf
+    regexp: "^server.port.*"
+    replace: 'server.port                 = {{ aptly_www_port }}'
+    backup: yes
+  tags:
+    - www-port
+
 #--- Service run ---#
 
 - name: Enable and start lighttpd service
