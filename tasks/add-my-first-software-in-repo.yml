@@ -9,7 +9,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   get_url:
     dest: '{{ aptly_path_to_local_repo }}/upload/viber.deb'
     url: https://download.cdn.viber.com/cdn/desktop/Linux/viber.deb
@@ -23,7 +23,7 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_add_first_software_in_created_repo_over == 'cli'
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: 'aptly repo add {{ aptly_my_first_repo_name }} {{ aptly_path_to_local_repo }}/upload/viber.deb'
   register: add_pachage_to_repo
@@ -49,7 +49,7 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_add_first_software_in_created_repo_over == 'cli'
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: 'aptly publish update {{ aptly_my_first_repo_distribution }}'
 

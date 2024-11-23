@@ -3,7 +3,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt_key:
     url: https://www.aptly.info/pubkey.txt
     state: present
@@ -12,7 +12,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt_repository:
     repo: deb http://repo.aptly.info/ {{ aptly_repo_version_fact }} main
     state: present

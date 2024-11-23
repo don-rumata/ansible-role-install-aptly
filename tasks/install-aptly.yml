@@ -4,7 +4,7 @@
 #   when:
 #     - ansible_os_family == 'Debian'
 #     - ansible_pkg_mgr == 'apt'
-#   become: yes
+#   become: true
 #   package_facts:
   # register: qazwsxedc
 
@@ -25,7 +25,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
     name:
       # - aptly={{ aptly_latest_version }}
@@ -34,4 +34,4 @@
       # - aptly-publisher
     # state: present
     state: latest
-    install_recommends: yes
+    install_recommends: true

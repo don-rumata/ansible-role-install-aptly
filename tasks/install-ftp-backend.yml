@@ -3,30 +3,30 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   template:
     src: vsftpd.conf.j2
     dest: /etc/vsftpd.conf
     mode: '644'
-    backup: yes
+    backup: true
 
 - name: Install Vsftpd
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
     name:
       - vsftpd
     state: present
-    install_recommends: yes
+    install_recommends: true
 
 - name: Enable and start vsftpd service
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   service:
     name: vsftpd
     state: started
-    enabled: yes
+    enabled: true

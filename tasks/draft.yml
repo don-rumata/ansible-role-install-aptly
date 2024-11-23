@@ -113,7 +113,7 @@
       - 400
 
 - name: Add file to "upload" dir
-  become: yes
+  become: true
   get_url:
     url: http://pxe/soft/rocketchat/client/rocketchat_latest_x86_64.deb
     dest: '{{ aptly_path_to_local_repo }}/upload/rocketchat/rocketchat_latest_x86_64.deb'
@@ -129,12 +129,12 @@
       - 400
 
 # - name: stop
-#   become: yes
+#   become: true
 #   block:
 #     - shell: systemctl stop aptly-api.service
 
 # - name: RUN aptly aptly publish repo {{ aptly_my_first_repo_name }}
-#   become: yes
+#   become: true
 #   become_user: '{{ aptly_user }}'
 #   command: "{{ item }}"
 #   with_items:
@@ -150,7 +150,7 @@
 #   when:
 #     - ansible_os_family == 'Debian'
 #     - ansible_pkg_mgr == 'apt'
-#   become: yes
+#   become: true
 #   become_user: '{{ aptly_user }}'
 #   block:
 #     - command: aptly repo create {{ test_repo_name }}

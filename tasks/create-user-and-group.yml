@@ -3,11 +3,11 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   user:
     name: '{{ aptly_user }}'
-    create_home: yes
-    password_lock: yes
+    create_home: true
+    password_lock: true
     comment: Aptly Service User
     system: true
     home: '{{ aptly_path_to_local_repo }}'

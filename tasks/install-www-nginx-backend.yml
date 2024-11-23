@@ -4,7 +4,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
     name:
       - nginx
@@ -12,13 +12,13 @@
       # # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=851784#10
       # - nginx-full
     state: present
-    install_recommends: yes
+    install_recommends: true
 
 - name: Delete default config from "sites-enabled"
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   file:
     path: /etc/nginx/sites-enabled/default
     state: absent
@@ -28,12 +28,12 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == false
-  become: yes
+  become: true
   template:
     src: 80-aptly-share.conf.nginx.j2
     dest: /etc/nginx/sites-available/80-aptly-share.conf
     mode: '644'
-    backup: yes
+    backup: true
     validate: bash -c 'nginx -t -c /dev/stdin <<< "events {worker_connections 1;} http { include %s; }"'
 
 # https://serverfault.com/a/811520/315697
@@ -42,19 +42,19 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == true
-  become: yes
+  become: true
   template:
     src: 80-aptly-share-webdav.conf.nginx.j2
     dest: /etc/nginx/sites-available/80-aptly-share.conf
     mode: '644'
-    backup: yes
+    backup: true
     # validate: bash -c 'nginx -t -c /dev/stdin <<< "events {worker_connections 1;} http { include %s; }"'
 
 - name: Enable share aptly
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   file:
     src: /etc/nginx/sites-available/80-aptly-share.conf
     dest: /etc/nginx/sites-enabled/80-aptly-share.conf
@@ -65,8 +65,8 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   service:
     name: nginx
     state: started
-    enabled: yes
+    enabled: true

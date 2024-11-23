@@ -5,7 +5,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: aptly repo list -raw
   register: aptly_created_repos
@@ -19,7 +19,7 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - not (aptly_my_first_repo_name in aptly_created_repos.stdout)
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: aptly repo create -distribution="{{ aptly_my_first_repo_distribution }}" -comment="{{ aptly_my_first_repo_comment }}" -component="{{ aptly_my_first_repo_component }}" {{ aptly_my_first_repo_name }}
   tags:
@@ -30,7 +30,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: aptly publish list -raw
   register: aptly_published_repos
@@ -45,7 +45,7 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - not (aptly_my_first_repo_distribution in aptly_published_repos.stdout)
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: aptly -architectures=i386,amd64 publish repo {{ aptly_my_first_repo_name }}
   tags:

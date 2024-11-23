@@ -3,11 +3,11 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   template:
     src: aptly-api.service.j2
     dest: /lib/systemd/system/{{ aptly_api_service_name }}.service
-    backup: yes
+    backup: true
   notify:
     - reload-daemon
     - restart-aptly-api
@@ -16,11 +16,11 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   service:
     name: "{{ aptly_api_service_name }}.service"
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Wait for Aptly service start
   when:

@@ -3,6 +3,6 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
-    update_cache: yes
+    update_cache: true

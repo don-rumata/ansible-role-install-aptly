@@ -3,18 +3,18 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
     name:
       - apache2
     state: present
-    install_recommends: yes
+    install_recommends: true
 
 - name: Disable 000-default.conf
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   command: a2dissite 000-default.conf
   args:
     removes: /etc/apache2/sites-enabled/000-default.conf
@@ -24,24 +24,24 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == false
-  become: yes
+  become: true
   template:
     src: 80-aptly-share.conf.apache.j2
     dest: /etc/apache2/sites-available/080-aptly-share.conf
     mode: '644'
-    backup: yes
+    backup: true
 
 - name: Allow access deb repo over wedav
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == true
-  become: yes
+  become: true
   template:
     src: 80-aptly-share-webdav.conf.apache.j2
     dest: /etc/apache2/sites-available/080-aptly-share.conf
     mode: '644'
-    backup: yes
+    backup: true
 
 # http://ashep.org/2011/nastrojka-webdav-pod-apache2/
 - name: Enable apache modules 4 webdav
@@ -49,7 +49,7 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == true
-  become: yes
+  become: true
   apache2_module:
     state: present
     name: "{{ item }}"
@@ -61,7 +61,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   command: a2ensite 080-aptly-share.conf
   args:
     creates: /etc/apache2/sites-enabled/080-aptly-share.conf
@@ -71,12 +71,12 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   lineinfile:
     dest: /etc/apache2/ports.conf
     line: 'Listen {{ aptly_www_port }}'
     insertafter: '^# /etc/apache2/sites-enabled/000-default.conf'
-    backup: yes
+    backup: true
   tags:
     - www-port
 
@@ -84,12 +84,12 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   replace:
     path: /etc/apache2/ports.conf
     regexp: "^Listen 80"
     replace: '# Listen 80'
-    backup: yes
+    backup: true
   tags:
     - www-port
 
@@ -97,7 +97,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   command: apache2ctl configtest
   register: apache_configtest
   changed_when: apache_configtest.rc != 0
@@ -106,8 +106,8 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   service:
     name: apache2
     state: started
-    enabled: yes
+    enabled: true

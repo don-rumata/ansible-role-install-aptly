@@ -29,7 +29,7 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_api_service_state.stat.exists == true
-  become: yes
+  become: true
   service:
       name: '{{ aptly_api_service_name }}'
       state: stopped

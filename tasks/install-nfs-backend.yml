@@ -3,18 +3,18 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
     name:
       - nfs-kernel-server
     state: present
-    install_recommends: yes
+    install_recommends: true
 
 - name: Config /etc/exports
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   lineinfile:
     path: /etc/exports
     line: '{{ aptly_path_to_local_repo }}/public          *(ro,sync,no_subtree_check)'
@@ -24,8 +24,8 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   service:
     name: nfs-kernel-server
     state: started
-    enabled: yes
+    enabled: true

@@ -1,6 +1,6 @@
 ---
 - name: Show gpg keys
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: gpg --list-keys
   register: gpg_list_keys
@@ -10,21 +10,21 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   template:
     src: gpg-gen-key-answers.j2
     dest: '{{ aptly_gpg_key_path }}/gpg-gen-key-answers'
     owner: '{{ aptly_user }}'
     group: '{{ aptly_group }}'
     mode: '600'
-    backup: yes
+    backup: true
 
 - name: Generate GPG key for repo
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - not (aptly_gpg_key_email in gpg_list_keys.stdout)
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: 'gpg --batch --gen-key {{ aptly_gpg_key_path }}/gpg-gen-key-answers'
 
@@ -34,7 +34,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: 'gpg --export --armor {{ aptly_gpg_key_email }}'
   register: aptly_gpg_key_export
@@ -44,7 +44,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   copy:
     content: '{{ aptly_gpg_key_export.stdout }}'
     dest: '{{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}'
@@ -55,7 +55,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt_key:
     file: '{{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}'
     state: present
@@ -64,7 +64,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   become_user: '{{ aptly_user }}'
   command: 'gpg --sign --default-key {{ aptly_gpg_key_email }} {{ aptly_path_to_local_repo }}/public/{{ aptly_gpg_publickey_filename }}'
   args:

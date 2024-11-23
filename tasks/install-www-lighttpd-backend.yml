@@ -3,24 +3,24 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   apt:
     name:
       - lighttpd
     state: present
-    install_recommends: yes
+    install_recommends: true
 
 - name: Install Lighttpd
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == true
-  become: yes
+  become: true
   apt:
     name:
       - lighttpd-mod-webdav
     state: present
-    install_recommends: yes
+    install_recommends: true
 
 #--- Classic share ---#
 
@@ -28,18 +28,18 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   template:
     src: 80-aptly-share.conf.lighttpd.j2
     dest: /etc/lighttpd/conf-available/80-aptly-share.conf
     mode: '644'
-    backup: yes
+    backup: true
 
 - name: Enable share aptly
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   command: lighttpd-enable-mod aptly-share
   args:
     chdir: /etc/lighttpd/conf-enabled
@@ -50,7 +50,7 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   command: lighttpd-enable-mod dir-listing
   args:
     chdir: /etc/lighttpd/conf-enabled
@@ -64,19 +64,19 @@
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == true
-  become: yes
+  become: true
   template:
     src: 80-aptly-share-webdav.conf.lighttpd.j2
     dest: /etc/lighttpd/conf-available/80-aptly-share-webdav.conf
     mode: '644'
-    backup: yes
+    backup: true
 
 - name: Enable webdav
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
     - aptly_www_webdav_access == true
-  become: yes
+  become: true
   command: lighttpd-enable-mod aptly-share-webdav
   args:
     chdir: /etc/lighttpd/conf-enabled
@@ -86,12 +86,12 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   replace:
     path: /etc/lighttpd/lighttpd.conf
     regexp: "^server.port.*"
     replace: 'server.port                 = {{ aptly_www_port }}'
-    backup: yes
+    backup: true
   tags:
     - www-port
 
@@ -101,8 +101,8 @@
   when:
     - ansible_os_family == 'Debian'
     - ansible_pkg_mgr == 'apt'
-  become: yes
+  become: true
   service:
     name: lighttpd
     state: started
-    enabled: yes
+    enabled: true

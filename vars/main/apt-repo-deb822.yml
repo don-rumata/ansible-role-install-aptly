@@ -1,0 +1,93 @@
+---
+# https://github.com/ansible/ansible/issues/77073
+# https://discourse.ubuntu.com/t/spec-apt-deb822-sources-by-default/29333
+# https://repolib.readthedocs.io/en/latest/deb822-format.html
+# https://blobfolio.com/2022/deb822-and-apt-key/
+
+apt_repo_deb822:
+  architectures: "{{ apt_repo_architectures | default('') | join(' ') }}"
+  components: "{{ apt_repo_components | default('') | join(' ') }}"
+  enabled: true
+  # signed-by: "{{ apt_repo_signed_by | default('') }}"
+  suites: "{{ apt_repo_suites | default([ansible_distribution_release]) | join(' ') }}"
+  types: "{{ apt_repo_types | default('') | join(' ') }}"
+  uris: "{{ apt_repo_uris | default('') | join(' ') }}"
+  x-repolib-name: "{{ apt_repo_x_repolib_name | default('') }}"
+
+# Example vars:
+
+# Zabbly project:
+# ```
+# apt_repo_architectures:
+#   - amd64
+# apt_repo_components:
+#   - main
+# apt_repo_types:
+#   - deb
+#   # - deb-src
+# apt_repo_uris:
+#   - http://pkgs.zabbly.com/kernel/stable
+# apt_repo_x_repolib_name: Linux stable kernel builds supported by Zabbly
+# ```
+
+
+
+# Ubuntu repos:
+# ```
+# apt_repo_architectures:
+#   - amd64
+#   # - i386
+# apt_repo_components:
+#   - main
+#   - universe
+#   - multiverse
+#   - restricted
+# apt_repo_suites:
+#   - "{{ ansible_distribution_release }}"
+#   - "{{ ansible_distribution_release }}-updates"
+#   - "{{ ansible_distribution_release }}-security"
+#   - "{{ ansible_distribution_release }}-backports"
+# apt_repo_types:
+#   - deb
+#   # - deb-src
+# apt_repo_uris:
+#   - http://archive.ubuntu.com/ubuntu
+#   - http://ru.archive.ubuntu.com/ubuntu
+#   - http://mirror.yandex.ru/ubuntu
+# apt_repo_x_repolib_name: Official Ubuntu repos
+# ```
+
+
+
+# Microsoft repo:
+# ```
+# apt_repo_architectures:
+#   - amd64
+#   - arm64
+#   - armhf
+# apt_repo_components:
+#   - main
+# apt_repo_types:
+#   - deb
+#   # - deb-src
+# apt_repo_uris:
+#   - "{{ http_or_https }}://packages.microsoft.com/{{ ansible_lsb.id | lower }}/{{ ansible_distribution_version }}/prod"
+# apt_repo_x_repolib_name: Official Microsoft repository
+# ```
+
+
+
+# VirtualBox repo:
+# ```
+# apt_repo_architectures:
+#   - amd64
+# apt_repo_components:
+#   - contrib
+#   - non-free
+# apt_repo_types:
+#   - deb
+#   # - deb-src
+# apt_repo_uris:
+#   - "{{ http_or_https }}://download.virtualbox.org/virtualbox/debian"
+# apt_repo_x_repolib_name: Official VirtualBox repository
+# ```
